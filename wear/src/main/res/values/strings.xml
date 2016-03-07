@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Represent</string>
+    <string name="my_digital_name">My Digital</string>
+    <string name="title_activity_chinton">Chinton</string>
+    <string name="title_activity_sandy">Sandy</string>
+    <string name="title_activity_rump">Rump</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_vote_view_rump">VoteViewRump</string>
+    <string name="title_activity_sample_grid_pager">SampleGridPagerAdapter</string>
+</resources>
