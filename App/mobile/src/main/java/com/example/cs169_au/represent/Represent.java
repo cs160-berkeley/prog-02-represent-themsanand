@@ -2,6 +2,7 @@ package com.example.cs169_au.represent;
 
 import android.app.Service;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
@@ -16,26 +17,46 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.tweetui.UserTimeline;
 
-public class Represent extends AppCompatActivity {
+import io.fabric.sdk.android.Fabric;
+
+public class Represent extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "STTw4x9gW3rHCLlvubYbuksWt";
+    private static final String TWITTER_SECRET = "hPx6raZWEQnDSgoJPuz26RQO8FG6ArcvCgNtWlHnlhvqbMl0Eb";
+
 
     private GoogleApiClient mApiClient;
+    private GoogleApiClient mGoogleApiClient;
+    private double latitude;
+    private double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
 
         mApiClient = new GoogleApiClient.Builder( this )
                 .addApi( Wearable.API )
                 .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(Bundle connectionHint) {
+
                     }
 
                     @Override
@@ -44,10 +65,19 @@ public class Represent extends AppCompatActivity {
                 })
                 .build();
 
+        UserTimeline userTimeline = new UserTimeline.Builder().screenName("fabric").build();
+        
+
         setContentView(R.layout.activity_represent);
         final EditText handleField = (EditText) findViewById(R.id.ZIPInput);
         final Button zipbtn = (Button) findViewById(R.id.ZIPSearchButton);
         final Button currbtn = (Button) findViewById(R.id.CurrentLocationButton);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
 
         zipbtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -59,14 +89,17 @@ public class Represent extends AppCompatActivity {
         });
         currbtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String zipcode = getZipCode();
-                passToCongressional(zipcode);
+                getZipCode();
             }
         });
     }
 
-    public String getZipCode() {
-        return "94709";
+    public void getZipCode() {
+        Intent myReprIntent = new Intent(this, Congressional.class);
+        //onStartCommand(getIntent(), zipcode);
+        myReprIntent.putExtra("lat", Double.toString(latitude));
+        myReprIntent.putExtra("long", Double.toString(longitude));
+        startActivity(myReprIntent);
     }
 
     public void passToCongressional(String zipcode) {
@@ -127,4 +160,53 @@ public class Represent extends AppCompatActivity {
         }).start();
     }
 
+
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.e("TAG", "Location services connected.");
+        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (location == null) {
+            // Blank for a moment...
+        }
+        else {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+        };
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.e("TAG", "Location services suspended. Please reconnect.");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e("TAG", "Location services failed. Please reconnect.");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
 }
