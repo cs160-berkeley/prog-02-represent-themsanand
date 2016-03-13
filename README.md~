@@ -2,7 +2,7 @@
 
 An app that allows you to look at local Senators and Representatives on both the phone and the watch.
 
-Move the code out of App, into the Represent folder, to run it.
+Move the code out of App, into a higher-level Represent folder, to run it.
 
 ## Authors
 
@@ -10,10 +10,11 @@ Mukunda Satchidanand ([mukundas@berkeley.edu](mailto:mukundas@berkeley.edu))
 
 ## Demo Video
 
-See [Represent here.] (https://youtu.be/GVYs2bvxFg4)
+See [Represent here.] (https://www.youtube.com/watch?v=qXcKHXnyqmg)
 
 ## Screenshots
 
-<img src="screenshots/Main.png" height="400" alt="Screenshot"/>
-<img src="screenshots/Detailed.png" height="400" alt="Screenshot2"/>
-<img src="screenshots/Congressional.png" height="400" alt="Screenshot3"/>
+<img src="screenshots/RepresentWelcomeScreen.png" height="400" alt="Screenshot"/>
+<img src="screenshots/RepresentCongressionalScreen.png" height="400" alt="Screenshot2"/>
+<img src="screenshots/RepresentCongressionalEmailScreen.png" height="400" alt="Screenshot3"/>
+<img src="screenshots/RepresentDetailedScreen.png" height="400" alt="Screenshot4"/>
